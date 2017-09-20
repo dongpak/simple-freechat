@@ -1,0 +1,20 @@
+<style>
+	.errorMessage {
+		color: red;
+	}
+</style>
+<h1>Main Chat Area</h1>
+<div>
+	{{$ctrl.name}}, welcome to the main chat area.  Enter a message in the area provided.
+</div>
+<div>
+	<form ng-submit="$ctrl.addMessage()">
+		<input type="text" size="90" ng-model="$ctrl.newMessage" placeholder="enter a message here"/>
+		<input type="submit" value="Send"/>
+	</form>
+</div>
+<div>
+	<textarea id="message-area" ng-model="$ctrl.messageArea" rows="15" cols="100" readonly="readonly"></textarea>
+</div>
+
+
