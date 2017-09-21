@@ -1,33 +1,38 @@
-<style>
-	.errorMessage {
-		color: red;
-	}
-</style>
-<h1>Welcome</h1>
-<p>
-	<big>Welcome to the chat application developed to run in the cloud.</big><br/>
-	<big>Please enter your name below.  Your name can be anything.</big><br/>
-	<big>It just need to be unique.</big><br/>
-</p>
-<p>
-	<big>With a unique name, you will be able to enter into the main chat area.</big><br/> 
-	<big>Please enjoy and do not enter disturbing messages.</big><br/>
-</p>
-<form ng-submit="$ctrl.checkName()">
-	<table>
-		<tr>
-			<td colspan="2">
-				<label class="errorMessage">{{$ctrl.errorMessage}}</label>
-			</td>
-		</tr>
-		<tr>
-			<td><big><b>Please enter your name here:</b></big></td>
-			<td><big><b><input type="text" ng-model="$ctrl.name" placeholder="enter name here"/></b></big></td>`
-		</tr>
-		<tr>
-			<td/>
-			<td><input type="submit" value="Please enter me to the main chat"/></td>
-		</tr>
-	</table>
-</form>
-
+<div>
+	<style>
+		.large-font {
+			font-family: fantasy;
+    		font-size: large;	
+		}
+		.errorMessage {
+			color: red;
+		}
+	</style>
+	<h1>Welcome</h1>
+	<p class="large-font">
+	Welcome to the chat application developed to run in the cloud.<br/>
+	Please enter your name below.  Your name can be anything.<br/>
+	It just need to be unique.<br/>
+	</p>
+	<p class="large-font">
+	With a unique name, you will be able to enter into the main chat area.<br/>
+	Please enjoy and do not enter disturbing messages.<br/>
+	</p>
+	<form ng-submit="$ctrl.checkName()">
+		<table>
+			<tr>
+				<td colspan="2">
+					<label class="errorMessage">{{$ctrl.errorMessage}}</label>
+				</td>
+			</tr>
+			<tr>
+				<td class="large-font">Please enter your name here:</b></big></td>
+				<td><input class="large-font" type="text" ng-model="$ctrl.name" placeholder="enter name here"/></td>
+			</tr>
+			<tr>
+				<td/>
+				<td><input class="large-font" type="submit" value="Please enter me to the main chat"/></td>
+			</tr>
+		</table>
+	</form>
+</div>
