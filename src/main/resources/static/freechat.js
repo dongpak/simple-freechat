@@ -65,13 +65,13 @@ angular.module('freechatApp').component('freechatMainArticle', {
         		method: 'POST',
         		url:	'api/username',
         		data:	{
-        			value: this.name
+        			id: this.name
         		},
         		parent: this,        		
         	}).then(function(response) {
         		console.log("Success status: " + response.status + "/" + response.statusText);
         		
-        		usernameService.setUsername(response.config.data.value);
+        		usernameService.setUsername(response.config.data.id);
         		$location.path('/NameEntered');
         	},
         	function(response) {

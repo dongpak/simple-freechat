@@ -1,3 +1,6 @@
+/**
+ * 
+ */
 package com.simpsolu.freechat;
 
 import javax.ws.rs.ApplicationPath;
@@ -8,7 +11,14 @@ import org.springframework.context.annotation.Bean;
 
 import com.simpsolu.freechat.service.MessagingStorage;
 import com.simpsolu.freechat.service.UsernameStorage;
+import com.simpsolu.freechat.storage.StorageFactory;
+import com.simpsolu.freechat.storage.jpa.JpaStorageFactory;
 
+/**
+ * 
+ * @author dongp
+ *
+ */
 @SpringBootApplication
 @ApplicationPath("/freechat")
 public class SimpleFreechatApplication {
@@ -18,12 +28,12 @@ public class SimpleFreechatApplication {
 	}
 	
 	@Bean
-	protected MessagingStorage getMessagingStorage() {
-		return new MessagingStorage();
+	protected StorageFactory getStorageFactory() {
+		return new JpaStorageFactory();
 	}
 	
 	@Bean
-	protected UsernameStorage getUsernameStorage() {
-		return new UsernameStorage();
+	protected MessagingStorage getMessagingStorage() {
+		return new MessagingStorage();
 	}
 }

@@ -3,6 +3,8 @@
  */
 package com.simpsolu.freechat.model;
 
+import java.util.Date;
+
 /**
  * 
  * @author dongp
@@ -10,7 +12,12 @@ package com.simpsolu.freechat.model;
  */
 public class Username {
 
-	private String	value;
+	private String	id;
+	private String	ipAddress;
+	private Boolean	active;
+	private Date	lastActiveDatetime;
+	private Date	createdDatetime;
+
 
 	/**
 	 * 
@@ -22,52 +29,89 @@ public class Username {
 	 * 
 	 * @param value
 	 */
-	public Username(String value) {
-		this.value = value;
+	public Username(String id) {
+		this.id = id;
+	}
+
+	/**
+	 * @return the id
+	 */
+	public String getId() {
+		return id;
+	}
+
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	/**
+	 * @return the ipAddress
+	 */
+	public String getIpAddress() {
+		return ipAddress;
+	}
+
+	/**
+	 * @param ipAddress the ipAddress to set
+	 */
+	public void setIpAddress(String ipAddress) {
+		this.ipAddress = ipAddress;
+	}
+
+	/**
+	 * @return the active
+	 */
+	public Boolean getActive() {
+		return active;
+	}
+
+	/**
+	 * @param active the active to set
+	 */
+	public void setActive(Boolean active) {
+		this.active = active;
+	}
+
+	/**
+	 * @return the lastActiveDatetime
+	 */
+	public Date getLastActiveDatetime() {
+		return lastActiveDatetime;
+	}
+
+	/**
+	 * @param lastActiveDatetime the lastActiveDatetime to set
+	 */
+	public void setLastActiveDatetime(Date lastActiveDatetime) {
+		this.lastActiveDatetime = lastActiveDatetime;
+	}
+
+	/**
+	 * @return the createdDatetime
+	 */
+	public Date getCreatedDatetime() {
+		return createdDatetime;
+	}
+
+	/**
+	 * @param createdDatetime the createdDatetime to set
+	 */
+	public void setCreatedDatetime(Date createdDatetime) {
+		this.createdDatetime = createdDatetime;
 	}
 	
 	/**
-	 * @return the value
+	 * 
+	 * @param source
 	 */
-	public String getValue() {
-		return value;
-	}
-
-	/**
-	 * @param value the value to set
-	 */
-	public void setValue(String value) {
-		this.value = value;
-	}
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((value == null) ? 0 : value.hashCode());
-		return result;
-	}
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Username other = (Username) obj;
-		if (value == null) {
-			if (other.value != null)
-				return false;
-		} else if (!value.equals(other.value))
-			return false;
-		return true;
+	public void copy(Username source) {
+		setId(source.getId());
+		setIpAddress(source.getIpAddress());
+		setActive(source.getActive());
+		setLastActiveDatetime(source.getLastActiveDatetime());
+		setCreatedDatetime(source.getCreatedDatetime());
 	}
 }

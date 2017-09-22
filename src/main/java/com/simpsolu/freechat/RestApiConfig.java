@@ -14,8 +14,8 @@ import com.simpsolu.freechat.api.UsernameApi;
 
 @Component
 @ApplicationPath("/api")
-public class JaxRSConfig extends ResourceConfig {
-    public JaxRSConfig() {
+public class RestApiConfig extends ResourceConfig {
+    public RestApiConfig() {
         registerEndpoints();
     }
 

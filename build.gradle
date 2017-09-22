@@ -7,12 +7,14 @@ buildscript {
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+		classpath("com.bmuschko:gradle-docker-plugin:3.0.7")
 	}
 }
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
+apply plugin: 'com.bmuschko.docker-remote-api'
 
 group = 'com.simpsolu'
 version = '0.0.1-SNAPSHOT'
@@ -26,5 +28,41 @@ repositories {
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-jersey')
 	compile('org.springframework.boot:spring-boot-starter-web')
+	compile('org.springframework.boot:spring-boot-starter-data-jpa')
+	compile('org.springframework.boot:spring-boot-starter-logging')
+	
+	runtime('mysql:mysql-connector-java')
+	
 	testCompile('org.springframework.boot:spring-boot-starter-test')
+}
+
+import com.bmuschko.gradle.docker.tasks.container.*
+import com.bmuschko.gradle.docker.tasks.image.*
+import com.bmuschko.gradle.docker.tasks.*
+
+docker {
+	url = 'unix:///var/run/docker.sock'
+	
+}
+
+task dockerInit(type: Copy) {
+	dependsOn assemble
+	
+	into("$buildDir/docker")
+	from("src/docker") {
+		include '**/*.dockerfile'
+		include 'entrypoint.sh'
+	}
+	from("$buildDir/libs/") {
+		include '**/*.jar'
+	}
+}
+
+task dockerImageBuild(type: DockerBuildImage) {
+	dependsOn dockerInit
+	
+	tag			= "freechat"
+	inputDir	= file("$buildDir/docker")
+	dockerFile	= file("$buildDir/docker/jdk8.dockerfile")
+	remove		= true
 }

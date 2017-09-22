@@ -30,7 +30,7 @@ public class MessagingStorage {
 	public void newMessage(Message msg) {
 		msg.setTimestamp(System.currentTimeMillis());
 		storage.add(msg);
-		if (storage.size() > 200) {
+		if (storage.size() > 100) {
 			storage.poll();
 		}
 	}
