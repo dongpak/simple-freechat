@@ -17,6 +17,7 @@ public class Username {
 	private Boolean	active;
 	private Date	lastActiveDatetime;
 	private Date	createdDatetime;
+	private String	token;
 
 
 	/**
@@ -103,6 +104,20 @@ public class Username {
 		this.createdDatetime = createdDatetime;
 	}
 	
+	/**
+	 * @return the token
+	 */
+	public String getToken() {
+		return token;
+	}
+
+	/**
+	 * @param token the token to set
+	 */
+	public void setToken(String token) {
+		this.token = token;
+	}
+
 	/**
 	 * 
 	 * @param source

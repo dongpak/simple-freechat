@@ -8,6 +8,7 @@ buildscript {
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
 		classpath("com.bmuschko:gradle-docker-plugin:3.0.7")
+		
 	}
 }
 
@@ -24,13 +25,13 @@ repositories {
 	mavenCentral()
 }
 
-
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-jersey')
 	compile('org.springframework.boot:spring-boot-starter-web')
 	compile('org.springframework.boot:spring-boot-starter-data-jpa')
 	compile('org.springframework.boot:spring-boot-starter-logging')
-	
+//	compile('org.springframework.boot:spring-boot-starter-security')
+	compile('com.auth0:java-jwt:3.2.0')
 	runtime('mysql:mysql-connector-java')
 	
 	testCompile('org.springframework.boot:spring-boot-starter-test')
@@ -65,4 +66,9 @@ task dockerImageBuild(type: DockerBuildImage) {
 	inputDir	= file("$buildDir/docker")
 	dockerFile	= file("$buildDir/docker/jdk8.dockerfile")
 	remove		= true
+}
+
+task liquibaseTar(type: Tar) {
+    from('src/liquibase')
+    baseName = 'liquibase'
 }

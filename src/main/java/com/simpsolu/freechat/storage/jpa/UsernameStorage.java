@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import com.simpsolu.freechat.model.Username;
 import com.simpsolu.freechat.storage.DuplicateInStorageException;
+import com.simpsolu.freechat.storage.NotFoundInStorageException;
 import com.simpsolu.freechat.storage.Storage;
 import com.simpsolu.freechat.storage.StorageBlock;
 import com.simpsolu.freechat.storage.StorageException;
@@ -58,14 +59,22 @@ public class UsernameStorage implements Storage<Username> {
 	
 	@Override
 	public Username find(Username sample) throws StorageException {
-		// TODO Auto-generated method stub
-		return null;
+		return repository.findOne(sample.getId());
 	}
 
 	@Override
 	public Username update(Username item) throws StorageException {
-		// TODO Auto-generated method stub
-		return null;
+		UsernameEntity entity = repository.findOne(item.getId());
+		
+		if (entity != null) {
+			entity.setLastActiveDatetime(item.getLastActiveDatetime());
+			repository.save(entity);
+		}
+		else {
+			throw new NotFoundInStorageException(item.getId());
+		}
+		
+		return entity;
 	}
 
 	@Override

@@ -13,7 +13,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.simpsolu.freechat.model.Username;
-import com.simpsolu.freechat.service.UsernameStorage;
+import com.simpsolu.freechat.service.AuthenticationService;
+import com.simpsolu.freechat.service.NotAuthorizedException;
 import com.simpsolu.freechat.storage.Storage;
 import com.simpsolu.freechat.storage.StorageFactory;
 
@@ -45,6 +45,9 @@ public class UsernameApi extends BaseApi {
 	@Autowired
 	private StorageFactory	factory;
 	
+	@Autowired
+	private AuthenticationService	security;
+	
 	@Context 
 	protected HttpServletRequest httpRequest;
 	
@@ -58,15 +61,19 @@ public class UsernameApi extends BaseApi {
 
 	@POST
 	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
 	public Response newUsername(Username username) {
 		Storage<Username>	storage = factory.getStorage(Username.class);
 		
 		try {
 			updateUsername(username);
-			return Response.ok(storage.store(username)).build();
+			username = storage.store(username);
+			security.createToken(username);
+			
+			return Response.ok(username).build();
 		}
-		catch (Exception e) {
-			return generateErrorResponse(e);
+		catch (Throwable t) {
+			return generateErrorResponse(t);
 		}
 	}
 	
@@ -78,17 +85,21 @@ public class UsernameApi extends BaseApi {
 	@Path("{username}")
 	@Produces({MediaType.APPLICATION_JSON})
     public Response deleteUsername() {
+		
+		logger.info("Archiving username: " + username);
 		Storage<Username>	storage = factory.getStorage(Username.class);
 		
 		try {
-			Username	item = new Username();
+			Username	item = security.verifyToken(httpRequest);
 			
-			item.setId(username);
+			if (item.getId().equals(username) == false) {
+				throw new NotAuthorizedException("Not allowed to archive user");
+			}			
 			
 			return Response.ok(storage.archive(item)).build();
 		}
-		catch (Exception e) {
-			return generateErrorResponse(e);
+		catch (Throwable t) {
+			return generateErrorResponse(t);
 		}
     }
 }

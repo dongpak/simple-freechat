@@ -3,6 +3,8 @@
  */
 package com.simpsolu.freechat.storage.jpa;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -32,4 +34,23 @@ public class UsernameEntity extends Username {
 	public String getIpAddress() {		
 		return super.getIpAddress();
 	}
+	
+	@Column(name="created_date")
+	@Override
+	public Date getCreatedDatetime() {		
+		return super.getCreatedDatetime();
+	}
+	
+	@Column(name="last_active_date")
+	@Override
+	public Date getLastActiveDatetime() {
+		return super.getLastActiveDatetime();
+	}
+	
+	@Column(name="active")
+	@Override
+	public Boolean getActive() {
+		return super.getActive();
+	}
+	
 }

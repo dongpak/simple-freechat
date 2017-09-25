@@ -8,11 +8,11 @@ angular.module('freechatApp', [
 	'ngRoute'
 ]);
 
-angular.module('freechatApp').run(function($window) {
+angular.module('freechatApp').run(function($window, usernameService) {
 	window.onbeforeunload = function(event) {
 		console.log('beforeunload event detected: cancelable=' + event.cancelable);
-		if (event.cancelable) {
-			console.log('Canceling the page unload')
+		if (event.cancelable) {			
+			usernameService.archiveUsername();
 			event.preventDefault();
 		}
 	}
@@ -31,21 +31,44 @@ angular.module('freechatApp').config(['$locationProvider', '$routeProvider',
     }
 ]);
 
-angular.module('freechatApp').factory('usernameService', function() {
+angular.module('freechatApp').factory('usernameService', function($http) {
 	this.username = null;
 	
-	var setUsername = function(name) {
+	
+	var setUsername = function(item) {
 		//console.log("Setting the username [" + name + "]")
-	    this.username = name;	    
+	    this.username = item;	    
 	}
 	
 	var getUsername = function() {
 		return this.username;
 	}
 	
+	var archiveUsername = function() {
+		if (this.username) {
+			console.log("chat destroyed: [" + this.username.id +"]");
+			$http({
+				method: 'DELETE',
+        		url:	'api/username/' + this.username.id,
+	        	headers: {
+	        		   'Authorization': 'Bearer ' + this.username.token
+	        	}
+			}).then(function(response) {
+				console.log("ArchiveUsername: Success status: " + response.status + "/" + response.statusText);
+			},
+			function(response) {
+				console.log("ArchiveUsername: Failure status: " + response.status + "/" + response.statusText);
+			});
+		}
+		else {
+			console.log("username destroyed already!");
+		}
+	}
+	
 	return {
 		setUsername: setUsername,
-		getUsername: getUsername
+		getUsername: getUsername,
+		archiveUsername: archiveUsername
 	}
 });
 
@@ -63,20 +86,18 @@ angular.module('freechatApp').component('freechatMainArticle', {
         	// has a valid name
         	$http({
         		method: 'POST',
-        		url:	'api/username',
+        		url:	'api/username',        		
         		data:	{
         			id: this.name
         		},
         		parent: this,        		
         	}).then(function(response) {
-        		console.log("Success status: " + response.status + "/" + response.statusText);
-        		
-        		usernameService.setUsername(response.config.data.id);
+        		// console.log("Success status: " + response.status + "/" + response.statusText);        		
+        		usernameService.setUsername(response.data);
         		$location.path('/NameEntered');
         	},
         	function(response) {
-        		console.log("Failure status: " + response.status + "/" + response.statusText);
-        		
+        		console.log("Failure status: " + response.status + "/" + response.statusText);        		
         		response.config.parent.errorMessage = 'Name is already taken.  Please enter a different name';        		
         	});
         }  
@@ -91,26 +112,24 @@ angular.module('freechatApp').component('freechatMainChat', {
 		ctrl.lastTimestamp	= new Date().getTime();
 		
 		this.$onDestroy = function() {
-			console.log("chat destroyed: [" + ctrl.username +"]");
-			$http.delete('api/username/'+ctrl.username).then(function(response) {
-				console.log("Success status: " + response.status + "/" + response.statusText);
-        	},
-        	function(response) {
-        		console.log("Failure status: " + response.status + "/" + response.statusText);
-        	});        	
+			usernameService.archiveUsername();      	
 		}
 		
 		this.$onInit = function() {
-			ctrl.username = usernameService.getUsername();			
-		    console.log("init: User name is [" + ctrl.username + "]");
-		    
+			ctrl.username = usernameService.getUsername();
+		    		    
 		    if (!ctrl.username) {
 		    	$location.path("/")
 		    }
-		    else {
-		    	
+		    else {		    	
 		    	$interval(function () {
-	        		$http.get('api/messaging?timestamp='+ctrl.lastTimestamp).then(function(response) {
+	        		$http({
+	        			method: 'GET',
+	            		url:	'api/messaging?timestamp='+ctrl.lastTimestamp,
+	    	        	headers: {
+	    	        		   'Authorization': 'Bearer ' + ctrl.username.token
+	    	        	}
+	        		}).then(function(response) {
 	        			response.data.forEach(function(item) {
 	        				var mstamp = item.timestamp;
 	        				
@@ -140,16 +159,24 @@ angular.module('freechatApp').component('freechatMainChat', {
 		
 		this.sendMessage = function() {
 	        		
-			console.log("send: Username=" + ctrl.username);
-	        var msgBody = {
-	        			"username": ctrl.username,
-	        			"message": ctrl.newMessage
-	        	}
-	        $http.post('api/messaging', msgBody).then(function(response) {
-	        	
+			console.log("send: Username=" + ctrl.username.id);
+	        
+	        $http({
+	        	method: 'POST',
+        		url:	'api/messaging',
+        		headers: {
+	        		   'Authorization': 'Bearer ' + ctrl.username.token
+	        	},
+        		data:	{
+        			username: ctrl.username.id,
+        			message: ctrl.newMessage
+        		}
+	        }).then(function(response) {
+	        	// console.log("Success status: " + response.status + "/" + response.statusText);
 	        },
 	        function(response) {
-	        	
+	        	console.log("Failure status: " + response.status + "/" + response.statusText);
+	        	$location.path("/")
 	        });
 	        	
 	        ctrl.newMessage = '';

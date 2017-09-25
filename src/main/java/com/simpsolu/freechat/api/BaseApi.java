@@ -4,8 +4,11 @@
 package com.simpsolu.freechat.api;
 
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
+
+import com.simpsolu.freechat.service.NotAuthorizedException;
 
 
 
@@ -34,7 +37,12 @@ public abstract class BaseApi {
 	protected Response generateErrorResponse(Throwable t) {
 		Response	r = null;
 		
-		r = Response.serverError().build();
+		if (t instanceof NotAuthorizedException) {
+			r = Response.status(Status.UNAUTHORIZED).build();
+		}
+		else {
+			r = Response.serverError().build();
+		}
 		
 		logger.error("Generating " + r.getStatus() + " " + r.getStatusInfo().getReasonPhrase() + " for "+ t, t);	
 		
