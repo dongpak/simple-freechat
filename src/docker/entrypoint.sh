@@ -1,2 +1,2 @@
 #!/bin/sh
-java -jar /home/app.jar
+java -cp /home -jar /home/app.jar

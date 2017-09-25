@@ -4,6 +4,8 @@
 package com.simpsolu.freechat.service;
 
 
+import java.util.Enumeration;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -39,6 +41,9 @@ public class AuthenticationService {
 	
     @Value("${jwt.secret}")
 	private String	secret;
+    
+    @Value("${jwt.debug}")
+    private boolean debug;
 	
 
 	/**
@@ -57,6 +62,31 @@ public class AuthenticationService {
 		item.setToken(token);
 		return token;
 	}
+	
+	/**
+	 * 
+	 * @param request
+	 * @return
+	 */
+	public String getRemoteAddr(HttpServletRequest request) {
+		
+		if (debug) {
+			Enumeration<String> en = request.getHeaderNames();		
+			while (en.hasMoreElements()) {
+				String key	= en.nextElement();			
+				String val	= request.getHeader(key);
+			
+				logger.info("Header [" + key + "] -> " + val);
+			}
+		}
+		
+		String addr = request.getHeader("x-forwarded-for");
+		if ((addr != null) && (addr.trim().isEmpty() == false)) {
+			return addr;
+		}
+		
+		return request.getRemoteAddr();
+	}
 		
 	/**
 	 * 
@@ -69,7 +99,7 @@ public class AuthenticationService {
 		String 		token		= auth.substring(7);
 		Username	item		= verifyToken(token);
 		
-		if (item.getIpAddress().equals(request.getRemoteAddr()) == false) {
+		if (item.getIpAddress().equals(getRemoteAddr(request)) == false) {
 			throw new NotAuthorizedException("IP address(" + request.getRemoteAddr() + ") does not match one in token: " + item.getIpAddress());
 		}
 		return item;
