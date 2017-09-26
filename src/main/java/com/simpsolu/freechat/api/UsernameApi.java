@@ -77,8 +77,8 @@ public class UsernameApi extends BaseApi {
 		}
 	}
 	
-	private void updateUsername(Username username) {
-		username.setIpAddress(httpRequest.getRemoteAddr());
+	private void updateUsername(Username username) {		
+		username.setIpAddress(security.getRemoteAddr(httpRequest));
 	}
 	
 	@DELETE

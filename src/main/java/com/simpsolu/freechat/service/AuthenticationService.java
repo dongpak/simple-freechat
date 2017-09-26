@@ -100,7 +100,7 @@ public class AuthenticationService {
 		Username	item		= verifyToken(token);
 		
 		if (item.getIpAddress().equals(getRemoteAddr(request)) == false) {
-			throw new NotAuthorizedException("IP address(" + request.getRemoteAddr() + ") does not match one in token: " + item.getIpAddress());
+			throw new NotAuthorizedException("IP address(" + getRemoteAddr(request) + ") does not match one in token: [" + item.getIpAddress() + "]");
 		}
 		return item;
 	}
