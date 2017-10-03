@@ -5,9 +5,13 @@ package com.simpsolu.freechat.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.ringbuffer.Ringbuffer;
 import com.simpsolu.freechat.model.Message;
 
 /**
@@ -17,22 +21,23 @@ import com.simpsolu.freechat.model.Message;
  */
 public class MessagingStorage {
 
-	private Queue<Message> storage;
+	private static Logger logger = LoggerFactory.getLogger(MessagingStorage.class);
 	
-	public MessagingStorage() {
-		storage = new ConcurrentLinkedQueue<Message>();
-	}
-
+	@Autowired
+	private HazelcastInstance instance;
+	
+	
 	/**
 	 * 
 	 * @param msg
 	 */
 	public void newMessage(Message msg) {
 		msg.setTimestamp(System.currentTimeMillis());
-		storage.add(msg);
-		if (storage.size() > 100) {
-			storage.poll();
-		}
+		getMessages().add(msg);		
+	}
+	
+	protected Ringbuffer<Message> getMessages() {
+		return instance.getRingbuffer("simpsolu-freechat-messages");
 	}
 	
 	/**
@@ -41,12 +46,30 @@ public class MessagingStorage {
 	 * @return
 	 */
 	public List<Message> getMessagesAfter(long timestamp) {
-		List<Message>	result = new ArrayList<Message>();
+		Ringbuffer<Message>	messages	= getMessages();
+		List<Message>		result 		= new ArrayList<Message>();
 		
-		for (Message msg : storage) {
-			if (msg.getTimestamp() >= timestamp) {
-				result.add(msg);
+		boolean	readMore	= true;
+		
+		long tail	= messages.tailSequence();
+		long head	= messages.headSequence();
+		long curr	= head;
+		
+		
+		while (curr <= tail) {
+			
+			try {
+				Message msg	= messages.readOne(curr);
+					
+				if (msg.getTimestamp() >= timestamp) {
+					result.add(msg);
+				}
 			}
+			catch (Exception e) {
+				logger.warn("Exception while reading from the ring buffer:" + e);
+			}
+							
+			curr++;
 		}
 		
 		return result;

@@ -3,12 +3,14 @@
  */
 package com.simpsolu.freechat.model;
 
+import java.io.Serializable;
+
 /**
  * 
  * @author dongp
  *
  */
-public class Message {
+public class Message implements Serializable {
 
 	private String	username;	
 	private String	message;

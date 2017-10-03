@@ -1,0 +1,33 @@
+<hazelcast
+        xsi:schemaLocation="http://www.hazelcast.com/schema/config http://www.hazelcast.com/schema/config/hazelcast-config-3.8.xsd"
+        xmlns="http://www.hazelcast.com/schema/config"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<group>
+    	<name>simpsolu-freechat</name>
+    	<password>${inMemoryGrid.secret}</password>
+	</group>
+	<properties>
+    	<property name="hazelcast.discovery.enabled">true</property>
+    	<property name="hazelcast.discovery.private.ip.enabled">true</property>
+  	</properties>
+    <network>
+		<join>
+        	<tcp-ip enabled="false"></tcp-ip>
+        	<multicast enabled="false"/>
+        	<aws enabled="false"/>
+        	<discovery-strategies>            
+            	<discovery-strategy enabled="true" class="com.hazelcast.aws.AwsDiscoveryStrategy">
+            	    <properties>                		
+            	    	<property name="access-key">simpsolu-freechat</property>
+            	    	<property name="secret-key">simpsolu-freechat</property>
+                   		<property name="iam-role">${inMemoryGrid.iamRole}</property>
+                   		<property name="region">us-east-2</property>
+                   		<property name="host-header">ec2.amazonaws.com</property>
+                   		<property name="security-group-name">hazelcast-security-group</property>
+                   		<property name="hz-port">5701</property>
+                	</properties>
+            	</discovery-strategy>
+        	</discovery-strategies>
+    	</join>
+    </network>
+</hazelcast>
